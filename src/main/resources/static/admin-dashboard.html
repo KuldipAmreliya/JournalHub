@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - JournalHub</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="admin-body">
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="nav-brand">
+            <i class="fas fa-book-journal-whills"></i>
+            <span>JournalHub Admin</span>
+        </div>
+        <div class="nav-links">
+            <a href="dashboard.html" class="nav-link">
+                <i class="fas fa-book"></i>
+                My Journal
+            </a>
+            <button id="userMenuBtn" class="user-menu-btn">
+                <i class="fas fa-user-shield"></i>
+                <span>Admin</span>
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- User Menu Dropdown -->
+    <div id="userDropdown" class="user-dropdown">
+        <a href="dashboard.html">
+            <i class="fas fa-book"></i>
+            My Journal
+        </a>
+        <a href="#" id="logoutBtn">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+        </a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="admin-container">
+        <!-- Stats Section -->
+        <div class="stats-section">
+            <div class="stat-card">
+                <i class="fas fa-users"></i>
+                <div class="stat-info">
+                    <span id="totalUsers">0</span>
+                    <span>Total Users</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-book"></i>
+                <div class="stat-info">
+                    <span id="totalEntries">0</span>
+                    <span>Total Entries</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Management Section -->
+        <div class="users-section">
+            <div class="section-header">
+                <h2>User Management</h2>
+                <button id="createAdminBtn" class="btn-primary">
+                    <i class="fas fa-user-plus"></i>
+                    Create Admin User
+                </button>
+            </div>
+
+            <!-- Search and Filter -->
+            <div class="filter-section">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="userSearch" placeholder="Search users...">
+                </div>
+                <div class="role-filter">
+                    <select id="roleFilter">
+                        <option value="all">All Roles</option>
+                        <option value="user">Users</option>
+                        <option value="admin">Admins</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Users Table -->
+            <div class="users-table-container">
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Role</th>
+                            <th>Entries</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <!-- Users will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Admin Modal -->
+    <div id="createAdminModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create Admin User</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="adminUsername">Username</label>
+                    <input type="text" id="adminUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="adminPassword">Password</label>
+                    <input type="password" id="adminPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancelAdminBtn">Cancel</button>
+                <button class="btn-primary" id="submitAdminBtn">Create Admin</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
+
+    <script src="js/admin.js"></script>
+</body>
+</html> 

@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Journal Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding-top: 20px;
+        }
+        .sidebar .nav-link {
+            color: #ecf0f1;
+            margin: 5px 0;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        .sidebar .nav-link:hover {
+            background-color: #34495e;
+            color: #fff;
+        }
+        .sidebar .nav-link.active {
+            background-color: #3498db;
+            color: #fff;
+        }
+        .main-content {
+            padding: 20px;
+        }
+        .journal-card {
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+        }
+        .journal-card:hover {
+            transform: translateY(-5px);
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .form-control:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+        .btn-primary {
+            background-color: #3498db;
+            border-color: #3498db;
+        }
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+        .btn-danger {
+            background-color: #e74c3c;
+            border-color: #e74c3c;
+        }
+        .btn-danger:hover {
+            background-color: #c0392b;
+            border-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar">
+                <div class="text-center mb-4">
+                    <h4>Journal Hub</h4>
+                </div>
+                <nav class="nav flex-column">
+                    <a class="nav-link active" href="#" onclick="showSection('journals')">
+                        <i class="fas fa-book me-2"></i> My Journals
+                    </a>
+                    <a class="nav-link" href="#" onclick="showSection('new-entry')">
+                        <i class="fas fa-plus me-2"></i> New Entry
+                    </a>
+                    <a class="nav-link" href="#" onclick="showSection('profile')">
+                        <i class="fas fa-user me-2"></i> Profile
+                    </a>
+                    <form action="/logout" method="POST" class="mt-auto">
+                        <button type="submit" class="nav-link text-danger">
+                            <i class="fas fa-sign-out-alt me-2"></i> Logout
+                        </button>
+                    </form>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <!-- Loading Overlay -->
+                <div class="loading-overlay">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+
+                <!-- Toast Container -->
+                <div class="toast-container"></div>
+
+                <!-- Journals Section -->
+                <div id="journals-section" class="section">
+                    <h2 class="mb-4">My Journal Entries</h2>
+                    <div id="journal-entries" class="row"></div>
+                </div>
+
+                <!-- New Entry Section -->
+                <div id="new-entry-section" class="section" style="display: none;">
+                    <h2 class="mb-4">Create New Entry</h2>
+                    <form id="new-entry-form">
+                        <div class="mb-3">
+                            <label for="entry-title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="entry-title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="entry-content" class="form-label">Content</label>
+                            <textarea class="form-control" id="entry-content" rows="10" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Entry</button>
+                    </form>
+                </div>
+
+                <!-- Profile Section -->
+                <div id="profile-section" class="section" style="display: none;">
+                    <h2 class="mb-4">Profile Settings</h2>
+                    <form id="profile-form">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">New Password (leave blank to keep current)</label>
+                            <input type="password" class="form-control" id="password">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Profile</button>
+                        <button type="button" class="btn btn-danger ms-2" onclick="deleteAccount()">Delete Account</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Entry Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Journal Entry</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="edit-entry-id">
+                    <div class="mb-3">
+                        <label for="edit-title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="edit-title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-content" class="form-label">Content</label>
+                        <textarea class="form-control" id="edit-content" rows="10" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="updateEntry()">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JavaScript -->
+    <script>
+        const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+
+        function showToast(message, type = 'success') {
+            const toastContainer = document.querySelector('.toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            toast.addEventListener('hidden.bs.toast', () => {
+                toast.remove();
+            });
+        }
+
+        function showSection(sectionName) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.style.display = 'none';
+            });
+            document.getElementById(`${sectionName}-section`).style.display = 'block';
+            
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.querySelector(`[onclick="showSection('${sectionName}')"]`).classList.add('active');
+            
+            if (sectionName === 'journals') {
+                loadJournalEntries();
+            }
+        }
+
+        function showLoading() {
+            document.querySelector('.loading-overlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.querySelector('.loading-overlay').style.display = 'none';
+        }
+
+        async function loadJournalEntries() {
+            showLoading();
+            try {
+                const response = await fetch('/journal');
+                if (response.ok) {
+                    const entries = await response.json();
+                    const container = document.getElementById('journal-entries');
+                    container.innerHTML = '';
+                    
+                    if (entries.length === 0) {
+                        container.innerHTML = `
+                            <div class="col-12 text-center">
+                                <p class="text-muted">No journal entries yet. Create your first entry!</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    entries.forEach(entry => {
+                        const date = new Date(entry.date).toLocaleDateString();
+                        const div = document.createElement('div');
+                        div.className = 'col-md-6 col-lg-4';
+                        div.innerHTML = `
+                            <div class="card journal-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">${entry.title}</h5>
+                                    <p class="card-text">${entry.content.substring(0, 100)}${entry.content.length > 100 ? '...' : ''}</p>
+                                    <p class="text-muted small">${date}</p>
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-primary" onclick="editEntry('${entry.id}')">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" onclick="deleteEntry('${entry.id}')">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        container.appendChild(div);
+                    });
+                } else if (response.status === 401) {
+                    window.location.href = '/login';
+                } else {
+                    showToast('Failed to load journal entries', 'danger');
+                }
+            } catch (error) {
+                console.error('Error loading entries:', error);
+                showToast('Error loading journal entries: ' + error.message, 'danger');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        document.getElementById('new-entry-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading();
+            const title = document.getElementById('entry-title').value.trim();
+            const content = document.getElementById('entry-content').value.trim();
+
+            if (!title || !content) {
+                showToast('Title and content are required', 'warning');
+                hideLoading();
+                return;
+            }
+
+            try {
+                const response = await fetch('/journal', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ title, content }),
+                });
+
+                if (response.ok) {
+                    document.getElementById('new-entry-form').reset();
+                    showToast('Journal entry created successfully');
+                    showSection('journals');
+                } else if (response.status === 401) {
+                    window.location.href = '/login';
+                } else {
+                    const errorData = await response.text();
+                    showToast(errorData || 'Failed to create journal entry', 'danger');
+                }
+            } catch (error) {
+                console.error('Error creating entry:', error);
+                showToast('Error creating journal entry: ' + error.message, 'danger');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        async function editEntry(id) {
+            showLoading();
+            try {
+                const response = await fetch(`/journal/id/${id}`);
+                if (response.ok) {
+                    const entry = await response.json();
+                    document.getElementById('edit-entry-id').value = id;
+                    document.getElementById('edit-title').value = entry.title;
+                    document.getElementById('edit-content').value = entry.content;
+                    editModal.show();
+                } else if (response.status === 401) {
+                    window.location.href = '/login';
+                } else {
+                    showToast('Failed to load journal entry', 'danger');
+                }
+            } catch (error) {
+                console.error('Error loading entry:', error);
+                showToast('Error loading journal entry: ' + error.message, 'danger');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function updateEntry() {
+            showLoading();
+            const id = document.getElementById('edit-entry-id').value;
+            const title = document.getElementById('edit-title').value.trim();
+            const content = document.getElementById('edit-content').value.trim();
+
+            if (!title || !content) {
+                showToast('Title and content are required', 'warning');
+                hideLoading();
+                return;
+            }
+
+            try {
+                const response = await fetch(`/journal/id/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ title, content }),
+                });
+
+                if (response.ok) {
+                    editModal.hide();
+                    showToast('Journal entry updated successfully');
+                    showSection('journals');
+                } else if (response.status === 401) {
+                    window.location.href = '/login';
+                } else {
+                    const errorData = await response.text();
+                    showToast(errorData || 'Failed to update journal entry', 'danger');
+                }
+            } catch (error) {
+                console.error('Error updating entry:', error);
+                showToast('Error updating journal entry: ' + error.message, 'danger');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function deleteEntry(id) {
+            if (confirm('Are you sure you want to delete this entry?')) {
+                showLoading();
+                try {
+                    const response = await fetch(`/journal/id/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (response.ok || response.status === 204) {
+                        showToast('Journal entry deleted successfully');
+                        showSection('journals');
+                    } else if (response.status === 401) {
+                        window.location.href = '/login';
+                    } else {
+                        const errorData = await response.text();
+                        showToast(errorData || 'Failed to delete journal entry', 'danger');
+                    }
+                } catch (error) {
+                    console.error('Error deleting entry:', error);
+                    showToast('Error deleting journal entry: ' + error.message, 'danger');
+                } finally {
+                    hideLoading();
+                }
+            }
+        }
+
+        document.getElementById('profile-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            if (!username) {
+                showToast('Username is required', 'warning');
+                hideLoading();
+                return;
+            }
+
+            try {
+                const response = await fetch('/user', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        username,
+                        ...(password ? { password } : {})
+                    }),
+                });
+
+                if (response.ok) {
+                    showToast('Profile updated successfully');
+                    document.getElementById('profile-form').reset();
+                } else if (response.status === 401) {
+                    window.location.href = '/login';
+                } else {
+                    const errorData = await response.text();
+                    showToast(errorData || 'Failed to update profile', 'danger');
+                }
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                showToast('Error updating profile: ' + error.message, 'danger');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        async function deleteAccount() {
+            if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                showLoading();
+                try {
+                    const response = await fetch('/user', {
+                        method: 'DELETE',
+                    });
+
+                    if (response.ok) {
+                        showToast('Account deleted successfully');
+                        window.location.href = '/login';
+                    } else if (response.status === 401) {
+                        window.location.href = '/login';
+                    } else {
+                        const errorData = await response.text();
+                        showToast(errorData || 'Failed to delete account', 'danger');
+                    }
+                } catch (error) {
+                    console.error('Error deleting account:', error);
+                    showToast('Error deleting account: ' + error.message, 'danger');
+                } finally {
+                    hideLoading();
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            showSection('journals');
+        });
+    </script>
+    <script type="text/javascript">
+        (function(d, m){
+            var kommunicateSettings =
+                {"appId":"328c4a0538c0bb82a4ecc7b9916b60713","popupWidget":true,"automaticChatOpenOnNavigation":true};
+            var s = document.createElement("script"); s.type = "text/javascript"; s.async = true;
+            s.src = "https://widget.kommunicate.io/v2/kommunicate.app";
+            var h = document.getElementsByTagName("head")[0]; h.appendChild(s);
+            window.kommunicate = m; m._globals = kommunicateSettings;
+        })(document, window.kommunicate || {});
+    /* NOTE : Use web server to view HTML files as real-time update will not work if you directly open the HTML file in the browser. */
+    </script>
+</body>
+</html> 

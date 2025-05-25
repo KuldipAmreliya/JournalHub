@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>About Us - JournalHub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet"/>
+    <style>
+        :root {
+          --primary: #1e3a8a;
+          --accent: #3b82f6;
+          --light: #ffffff;
+          --background: #f9fafb;
+          --text-dark: #1f2937;
+          --text-light: #6b7280;
+        }
+
+        body {
+          font-family: 'Segoe UI', sans-serif;
+          margin: 0;
+          padding: 0;
+          background: var(--background);
+          color: var(--text-dark);
+        }
+
+        /* Navbar */
+        .main-nav {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          background-color: var(--primary);
+          padding: 1rem 2rem;
+          color: var(--light);
+          flex-wrap: wrap;
+        }
+
+        .nav-brand {
+          display: flex;
+          align-items: center;
+          font-size: 1.5rem;
+          font-weight: bold;
+        }
+
+        .nav-brand i {
+          margin-right: 0.5rem;
+        }
+
+        .nav-links {
+          display: flex;
+          gap: 1.5rem;
+          flex-wrap: wrap;
+        }
+
+        .nav-links a {
+          color: var(--light);
+          text-decoration: none;
+          font-weight: 500;
+        }
+
+        .nav-links a:hover {
+          color: var(--accent);
+        }
+
+        .btn-login {
+          background-color: var(--accent);
+          padding: 0.4rem 0.8rem;
+          border-radius: 5px;
+        }
+
+        .nav-toggle {
+          display: none;
+          background: none;
+          border: none;
+          color: var(--light);
+          font-size: 1.5rem;
+        }
+
+        .section-title {
+          text-align: center;
+          font-size: 2.5rem;
+          margin-bottom: 2rem;
+          color: var(--primary);
+        }
+
+        .container {
+          width: 90%;
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 2rem 0;
+        }
+
+        .team-section {
+          background: var(--light);
+          padding: 3rem 0;
+        }
+
+        .team-grid {
+          display: flex;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+
+        .team-member {
+          text-align: center;
+          max-width: 600px;
+        }
+
+        .team-member img {
+          width: 240px;
+          height: 240px;
+          border-radius: 50%;
+          object-fit: cover;
+          margin-bottom: 1rem;
+          border: 4px solid var(--accent);
+        }
+
+        .team-member h3 {
+          font-size: 1.8rem;
+          margin-bottom: 0.2rem;
+        }
+
+        .team-member p {
+          font-size: 1rem;
+          color: var(--text-light);
+        }
+
+        .ceo-bio {
+          font-size: 1.05rem;
+          margin-top: 1rem;
+          line-height: 1.6;
+          color: var(--text-dark);
+          max-width: 600px;
+          margin-inline: auto;
+        }
+
+        .social-links {
+          margin-top: 0.5rem;
+        }
+
+        .social-links a {
+          margin: 0 0.5rem;
+          color: var(--accent);
+          font-size: 1.5rem;
+          transition: color 0.3s;
+        }
+
+        .social-links a:hover {
+          color: var(--primary);
+        }
+
+        .values-section {
+          background: var(--background);
+          padding: 3rem 0;
+        }
+
+        .values-grid {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 2rem;
+        }
+
+        .value-card {
+          background: var(--light);
+          border-radius: 12px;
+          padding: 2rem;
+          text-align: center;
+          width: 280px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+          transition: transform 0.3s ease;
+        }
+
+        .value-card:hover {
+          transform: translateY(-5px);
+        }
+
+        .value-card i {
+          font-size: 2.5rem;
+          color: var(--accent);
+          margin-bottom: 1rem;
+        }
+
+        .value-card h3 {
+          font-size: 1.5rem;
+          margin-bottom: 0.8rem;
+        }
+
+        .value-card p {
+          color: var(--text-light);
+          font-size: 1rem;
+          line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+          .main-nav {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .nav-links {
+            flex-direction: column;
+            width: 100%;
+          }
+
+          .nav-toggle {
+            display: block;
+            margin-top: 1rem;
+          }
+
+          .values-grid,
+          .team-grid {
+            flex-direction: column;
+            align-items: center;
+          }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="main-nav">
+    <div class="nav-brand">
+        <i class="fas fa-book-journal-whills"></i>
+        <span>JournalHub</span>
+    </div>
+    <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="#features">Features</a>
+        <a href="#about">About</a>
+        <a href="#pricing">Pricing</a>
+        <a href="login.html" class="btn-login">Login</a>
+    </div>
+    <button class="nav-toggle" id="navToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+</nav>
+
+<!-- Founder & CEO Section -->
+<section class="team-section">
+    <div class="container">
+        <h2 class="section-title" data-aos="fade-up">Meet Our Founder</h2>
+        <div class="team-grid">
+            <div class="team-member" data-aos="zoom-in" data-aos-delay="100">
+                <img src="https://media.licdn.com/dms/image/v2/D4D03AQE5ESs9EV2fcA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1718188543288?e=1751500800&v=beta&t=9aG_yDFSyg_8hB9ecWBdiPSaj7azHrrSAKO6NMEcO5U" alt="Kuldip Amreliya">
+                <h3>Kuldip Amreliya</h3>
+                <p>Founder & CEO</p>
+                <div class="social-links">
+                    <a href="https://www.linkedin.com/in/amreliyakuldip/"><i class="fab fa-linkedin"></i></a>
+                    <a href="https://github.com/KuldipAmreliya"><i class="fab fa-github"></i></a>
+                </div>
+                <p class="ceo-bio" data-aos="fade-up" data-aos-delay="200">
+                    <strong>Kuldip Amreliya </strong>is a dedicated Java developer and driven entrepreneur who founded JournalHub with a vision to build robust and scalable digital solutions for personal growth and mental wellness. With deep expertise in Java, Spring Boot, and backend architecture, he combines technical excellence with a strong product mindset. <strong>Kuldip</strong> believes in creating ethical, high-performance platforms that prioritize user privacy and real-world impact. His mission is to empower individuals through secure, thoughtfully engineered tools that enhance emotional well-being in the digital age.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Our Values Section -->
+<section class="values-section">
+    <div class="container">
+        <h2 class="section-title" data-aos="fade-up">Our Values</h2>
+        <div class="values-grid">
+            <div class="value-card" data-aos="flip-left" data-aos-delay="100" data-aos-duration="1000">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Privacy First</h3>
+                <p>Your journal entries are encrypted and stored securely. We never sell your data. You control your privacy.</p>
+            </div>
+            <div class="value-card" data-aos="flip-up" data-aos-delay="200" data-aos-duration="1000">
+                <i class="fas fa-heart"></i>
+                <h3>User-Centric</h3>
+                <p>Every update, feature, and layout is shaped by direct feedback and real journaling needs from our users.</p>
+            </div>
+            <div class="value-card" data-aos="flip-right" data-aos-delay="300" data-aos-duration="1000">
+                <i class="fas fa-lightbulb"></i>
+                <h3>Continuous Innovation</h3>
+                <p>We actively explore new tech to help you journal better: AI-powered suggestions, daily mood logs, and more.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- AOS Animation Library -->
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script>
+    AOS.init();
+</script>
+</body>
+</html>

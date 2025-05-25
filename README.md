@@ -35,7 +35,7 @@ JournalHub/
 1. Clone the repo:
 
    ```bash
-   git clone https://github.com/your-username/JournalHub.git
+   git clone https://github.com/KuldipAmreliya/JournalHub.git
    ```
 2. Configure MongoDB Atlas URI in `application.properties`.
 3. Run the application using your IDE or:
